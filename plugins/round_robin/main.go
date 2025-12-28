@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"math/rand"
 	"os"
 
 	"github.com/goyal-aman/mailmux/src/shared"
@@ -30,10 +31,12 @@ func (s *RoundRobinSelector) Select(downstreams []types.Downstream) (string, err
 		return "", errors.New("no downstreams available")
 	}
 
+	N := len(downstreams)
+	index := rand.Intn(N)
 	// For demonstration, we just return the first one.
 	// In a real round-robin, we'd need to persist state or use a random strategy if stateless.
-	log.Println("Selected downstream:", downstreams[1].Addr)
-	return downstreams[0].Addr, nil
+	log.Println("Selected downstream:", downstreams[index].Addr)
+	return downstreams[index].Addr, nil
 }
 
 func main() {

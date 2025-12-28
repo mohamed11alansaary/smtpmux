@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	netsmtp "net/smtp"
+	"os"
 	"strings"
 
 	"os/exec"
@@ -84,9 +85,25 @@ func (s *Session) Data(r io.Reader) error {
 		return errors.New("selected downstream not found in config")
 	}
 
-	// 6. Send Email
-	auth := netsmtp.PlainAuth("", selectedDS.User, selectedDS.Pass, strings.Split(selectedDS.Addr, ":")[0])
-	return netsmtp.SendMail(selectedDS.Addr, auth, s.From, s.To, mailData)
+	if err := send(selectedDS.User, selectedDS.Pass, selectedDS.Addr, s.From, s.To, mailData); err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func send(user, pass, addr, from string, to []string, mailData []byte) error {
+	var auth netsmtp.Auth
+	useInsecureAuth := os.Getenv("USE_INSECURE_AUTH")
+	if useInsecureAuth == "true" {
+		auth = &insecurePlainAuth{"", user, pass, strings.Split(addr, ":")[0]}
+	} else {
+		auth = netsmtp.PlainAuth("", user, pass, strings.Split(addr, ":")[0])
+	}
+
+	// Use InsecurePlainAuth to allow sending credentials to downstream containers (which are not localhost) without TLS
+	return netsmtp.SendMail(addr, auth, from, to, mailData)
 }
 
 func (s *Session) Mail(from string, opts *smtp.MailOptions) error {
