@@ -1,0 +1,11 @@
+users:
+  - email: "test@user.com"
+    password: "password123"
+    selector_algo_path: "./round_robin.star"
+    downstreams:
+      - addr: "localhost:1026"
+        user: "any"
+        pass: "any"
+      - addr: "localhost:1027"
+        user: "any"
+        pass: "any"
