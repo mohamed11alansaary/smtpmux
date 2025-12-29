@@ -4,35 +4,58 @@ SMTP Mux is a smart SMTP proxy that routes outgoing emails to different downstre
 
 ## Quick Start
 
-Get up and running in seconds using the provided Docker Compose setup.
+Full the image from registry with local smtp downstreams
+```
+docker pull ghcr.io/goyal-aman/smtpmux:latest
+```
 
-1.  **Navigate to the quickstart directory:**
-    ```bash
-    cd quickstart
-    ```
+Create config.yaml 
+```
+users:
+  - email: "test@user.com"
+    password: "password123"
+    selector_algo_path: "./plugins/round_robin/round-robin-plugin"
+    downstreams:
+      - addr: "mailserve1:1025"
+        user: "any"
+        pass: "any"
+      - addr: "mailserve2:1025"
+        user: "any"
+        pass: "any"
+```
 
-2.  **Start the services:**
-    ```bash
-    docker compose up -d
-    ```
-    This starts:
-    - `smtpmux` (the router) on port `1020`
-    - `mailserve1` (MailHog) on port `1026` (UI: http://localhost:8026)
-    - `mailserve2` (MailHog) on port `1027` (UI: http://localhost:8027)
+Start downstreams
+```
+docker network create smtpmux-net
+docker run --rm -d -p 8026:8025 --name mailserve1 --network=smtpmux-net mailhog/mailhog
+docker run --rm -d -p 8027:8025 --name mailserve2 --network=smtpmux-net mailhog/mailhog
+```
 
-3.  **Send a test email:**
-    Use `swaks` to send an email through the router:
-    ```bash
-    swaks --to hello@smtpmux.what \
-          --from curious@user.com \
-          --server localhost:1020 \
-          -a PLAIN \
-          --auth-user test@user.com \
-          --auth-password password123 \
-          --body "hello user"
-    ```
+Open localhost:8026 and localhost:8027 in brower to see the emails.
 
-4.  **Verify delivery:**
+Start smtpmux
+```
+docker run -p 1024:1020 \
+        -v $(pwd)/config.yaml:/app/config.yaml \
+        --network=smtpmux-net \
+        -e USE_INSECURE_AUTH=true \
+        ghcr.io/goyal-aman/smtpmux:latest
+```
+
+smptmux is now running. Now lets try to send an email through it. 
+
+Run this few times so see round robin in action
+```
+swaks --to hello@smtpmux.what \
+      --from curious@user.com \
+      --server localhost:1024 \
+      -a PLAIN \
+      --auth-user test@user.com \
+      --auth-password password123 \
+      --body "hello user"
+```
+
+**Verify delivery:**
     Open http://localhost:8026 and http://localhost:8027. You should see the email appear in one of them, depending on the routing logic.
 
 ## Features
